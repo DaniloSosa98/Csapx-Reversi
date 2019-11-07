@@ -63,24 +63,41 @@ public class ReversiServer implements ReversiProtocol {
         while(!r.gameOver()) {
 
             String board = r.toString();
-            networkOut1.println(board);
-            networkOut2.println(board);
+            networkOut1.print(board);
+            networkOut2.print(board);
 
             if (turn%2==0){
 
                 // read the next line of text from the client
-                networkOut1.print("Your turn ! Enter row column: ");
-                String line = networkIn1.nextLine();
+                networkOut1.println("Your turn ! Enter row column: ");
+                String move = networkIn1.nextLine();
+                r.makeMove(Character.getNumericValue(move.charAt(0)), Character.getNumericValue(move.charAt(2)));
+
+                networkOut1.println("A move has been made in row " + move.charAt(0) + " column " + move.charAt(2));
+                networkOut2.println("A move has been made in row " + move.charAt(0) + " column " + move.charAt(2));
 
             }else{
                 // read the next line of text from the client
-                networkOut2.print("Your turn ! Enter row column: ");
-                String line = networkIn2.nextLine();
+                networkOut2.println("Your turn ! Enter row column: ");
+                String move = networkIn2.nextLine();
+                r.makeMove(Character.getNumericValue(move.charAt(0)), Character.getNumericValue(move.charAt(2)));
 
+                networkOut2.println("A move has been made in row " + move.charAt(0) + " column " + move.charAt(2));
+                networkOut1.println("A move has been made in row " + move.charAt(0) + " column " + move.charAt(2));
             }
             turn++;
         }
 
+        if(r.getWinner()== Reversi.Move.PLAYER_ONE){
+            networkOut1.print("You won! Yay!");
+            networkOut2.print("You lost! Boo!");
+        }else if(r.getWinner()== Reversi.Move.PLAYER_TWO){
+            networkOut1.print("You lost! Boo!");
+            networkOut2.print("You won! Yay!");
+        }else{
+            networkOut1.print("You tied! Meh!");
+            networkOut2.print("You tied! Meh!");
+        }
 
         // attempt to safely close the socket and server socket
         client1.shutdownInput();

@@ -47,11 +47,11 @@ public class ReversiClient implements ReversiProtocol {
         Scanner prompt = new Scanner(System.in);
         int i = 0;
 
-        while(true) {
+        while(networkIn.hasNextLine()) {
 
             String response = networkIn.nextLine();
 
-            if(response.contains("[") || response.contains("0")){
+            if(response.contains("[") || response.contains("0") || response.contains("move")){
                 System.out.println(response);
 
             }else if(response.contains("You ")){
@@ -59,14 +59,10 @@ public class ReversiClient implements ReversiProtocol {
                 break;
             }else{
                 System.out.println(response);
+                //System.out.println(networkIn.nextLine());
                 String text = prompt.nextLine();
                 networkOut.println(text);
             }
-
-
-
-
-            // read the echo response from the server and print it
 
         }
 
