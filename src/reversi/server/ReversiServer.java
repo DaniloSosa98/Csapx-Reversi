@@ -31,12 +31,15 @@ public class ReversiServer implements ReversiProtocol {
             System.out.println("Usage: java ReversiServer DIM port");
             System.exit(1);
         }
+        //Dimensions and port from cmd line
         int DIM = Integer.valueOf(args[0]);
         int port = Integer.valueOf(args[1]);
 
+        //generate server socket with port
         ServerSocket server = new ServerSocket(port);
         System.out.println("DIM " + DIM + " port " + port);
 
+        //generate client one weith input and output
         System.out.println("Waiting for player one...");
         Socket client1 = server.accept();
         InputStream input1 = client1.getInputStream();
@@ -45,6 +48,7 @@ public class ReversiServer implements ReversiProtocol {
         PrintStream networkOut1 = new PrintStream(output1);
         System.out.println("Player 1 connected!");
 
+        //generate client two weith input and output
         System.out.println("Waiting for player two...");
         Socket client2 = server.accept();
         InputStream input2 = client2.getInputStream();
@@ -55,39 +59,47 @@ public class ReversiServer implements ReversiProtocol {
 
         System.out.println("Starting game!");
 
+        //reversi varibale and counter for turns
         Reversi r = new Reversi(DIM);
         int turn = 0;
 
 
-        // loop while the connection is open
+        // loop while game is not over
         while(!r.gameOver()) {
-
+            //variable for the board to print to each client
             String board = r.toString();
             networkOut1.print(board);
             networkOut2.print(board);
 
+            //turn of player 1
             if (turn%2==0){
 
-                // read the next line of text from the client
+               //send move instruction and receive coordinates
                 networkOut1.println("Your turn ! Enter row column: ");
                 String move = networkIn1.nextLine();
                 r.makeMove(Character.getNumericValue(move.charAt(0)), Character.getNumericValue(move.charAt(2)));
 
+                //send notification for made move
                 networkOut1.println("A move has been made in row " + move.charAt(0) + " column " + move.charAt(2));
                 networkOut2.println("A move has been made in row " + move.charAt(0) + " column " + move.charAt(2));
 
+            //turn of player 2
             }else{
-                // read the next line of text from the client
+
+                //send move instruction and receive coordinates
                 networkOut2.println("Your turn ! Enter row column: ");
                 String move = networkIn2.nextLine();
                 r.makeMove(Character.getNumericValue(move.charAt(0)), Character.getNumericValue(move.charAt(2)));
 
+                //send notification for made move
                 networkOut2.println("A move has been made in row " + move.charAt(0) + " column " + move.charAt(2));
                 networkOut1.println("A move has been made in row " + move.charAt(0) + " column " + move.charAt(2));
             }
+            //turn count
             turn++;
         }
 
+        //final message sent depending on who won
         if(r.getWinner()== Reversi.Move.PLAYER_ONE){
             networkOut1.print("You won! Yay!");
             networkOut2.print("You lost! Boo!");

@@ -34,22 +34,27 @@ public class ReversiClient implements ReversiProtocol {
                     "Usage: java ReversiClient " + "<hostname> <port>");
             System.exit(1);
         }
+        //Host and port from cmd line arguments
         String hostname = args[0];
         int port = Integer.valueOf(args[1]);
 
+        //Generate client socket with input and output
         Socket socket = new Socket(hostname, port);
         InputStream input = socket.getInputStream();
         Scanner networkIn = new Scanner(input);
-
         OutputStream output = socket.getOutputStream();
         PrintStream networkOut = new PrintStream(output);
 
+        //Scanner prompt for client requests
         Scanner prompt = new Scanner(System.in);
-        int i = 0;
 
+        //main while loop
         while(networkIn.hasNextLine()) {
-
+            //line from the server
             String response = networkIn.nextLine();
+
+            /*I was having problems because the board was sending each line individually
+            * so I used and if statement*/
 
             if(response.contains("[") || response.contains("0") || response.contains("move")){
                 System.out.println(response);
